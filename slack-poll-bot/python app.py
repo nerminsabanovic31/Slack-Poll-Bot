@@ -1,17 +1,17 @@
 # slack-poll-bot/app.py
 import os
 import requests
-import json
 
+# Slack token i kanal iz environment varijabli
 SLACK_TOKEN = os.environ['SLACK_TOKEN']
-CHANNEL_ID = "D02GY0HGEFN"  # general kanal
+CHANNEL_ID = "D02GY0HGEFN"  # tvoj general kanal ili privatni kanal
 
 def send_poll():
     headers = {
         "Authorization": f"Bearer {SLACK_TOKEN}",
         "Content-Type": "application/json"
     }
-
+    
     payload = {
         "channel": CHANNEL_ID,
         "text": "Are you working today?",
@@ -40,7 +40,7 @@ def send_poll():
                     },
                     {
                         "type": "button",
-                        "text": {"type": "plain_text", "text": "🛑 Off - Not working"},
+                        "text": {"type": "plain_text", "text": "🛑 Off"},
                         "value": "off",
                         "action_id": "off_click"
                     }
@@ -48,12 +48,8 @@ def send_poll():
             }
         ]
     }
-
-    response = requests.post(
-        "https://slack.com/api/chat.postMessage",
-        headers=headers,
-        data=json.dumps(payload)
-    )
+    
+    response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
     print(response.json())
 
 if __name__ == "__main__":
