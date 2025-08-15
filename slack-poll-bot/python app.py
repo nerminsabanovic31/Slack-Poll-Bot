@@ -1,56 +1,34 @@
-# slack-poll-bot/app.py
 import os
-import requests
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
-# Slack token i kanal iz environment varijabli
-SLACK_TOKEN = os.environ['SLACK_TOKEN']
-CHANNEL_ID = "D02GY0HGEFN"  # tvoj general kanal ili privatni kanal
+# Token bota (dodaj ga u Secrets GitHub-a kao SLACK_BOT_TOKEN)
+slack_token = os.environ["SLACK_BOT_TOKEN"]
+client = WebClient(token=slack_token)
 
-def send_poll():
-    headers = {
-        "Authorization": f"Bearer {SLACK_TOKEN}",
-        "Content-Type": "application/json"
-    }
+# ID kanala #general
+channel_id = "D02GY0HGEFN"
+
+# Poruka
+text = "*Are you working today?*\n\n" \
+       "🏠 Remote\n" \
+       "🏢 Office\n" \
+       "🛑 Off - Not working"
+
+try:
+    # Pošalji poruku
+    response = client.chat_postMessage(
+        channel=channel_id,
+        text=text
+    )
     
-    payload = {
-        "channel": CHANNEL_ID,
-        "text": "Are you working today?",
-        "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*Are you working today?*"
-                }
-            },
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {"type": "plain_text", "text": "🏠 Remote"},
-                        "value": "remote",
-                        "action_id": "remote_click"
-                    },
-                    {
-                        "type": "button",
-                        "text": {"type": "plain_text", "text": "🏢 Office"},
-                        "value": "office",
-                        "action_id": "office_click"
-                    },
-                    {
-                        "type": "button",
-                        "text": {"type": "plain_text", "text": "🛑 Off"},
-                        "value": "off",
-                        "action_id": "off_click"
-                    }
-                ]
-            }
-        ]
-    }
-    
-    response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
-    print(response.json())
+    # Dodaj reakcije automatski
+    ts = response["ts"]  # timestamp poruke
+    client.reactions_add(channel=channel_id, name="house", timestamp=ts)
+    client.reactions_add(channel=channel_id, name="office", timestamp=ts)  # možeš zamijeniti sa drugim emoji
+    client.reactions_add(channel=channel_id, name="no_entry_sign", timestamp=ts)
 
-if __name__ == "__main__":
-    send_poll()
+    print("Poruka poslata i reakcije dodane!")
+
+except SlackApiError as e:
+    print(f"Greška: {e.response['error']}")
