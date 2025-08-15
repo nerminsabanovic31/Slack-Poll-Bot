@@ -1,27 +1,20 @@
-name: Slack Poll Bot
+name: Send Slack Poll
 
 on:
-  workflow_dispatch:   # ručno pokretanje
-  schedule:
-    - cron: '0 7 * * *'  # svaki dan u 07:00 UTC
+  workflow_dispatch:  # možeš ručno pokrenuti
 
 jobs:
   send_poll:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
+      - uses: actions/checkout@v3
+      - name: Install Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-
-      - name: Install dependencies
+          python-version: "3.x"
+      - name: Install requests
         run: pip install requests
-
-      - name: Send Slack Poll
+      - name: Send poll to Slack
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-        run: python slack-poll-bot/app.py
+        run: python app.py
