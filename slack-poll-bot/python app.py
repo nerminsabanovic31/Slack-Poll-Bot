@@ -33,7 +33,7 @@ def send_poll():
                     },
                     {
                         "type": "button",
-                        "text": {"type": "plain_text", "text": "⛔ Off"},
+                        "text": {"type": "plain_text", "text": "⛔ Off - Not working"},
                         "action_id": "off"
                     }
                 ]
