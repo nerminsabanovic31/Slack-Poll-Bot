@@ -7,14 +7,27 @@ SLACK_TOKEN = os.environ['SLACK_TOKEN']
 CHANNEL = "#general"  # ili #tvoj-kanal
 
 def send_poll():
-    text = '/poll "Are you working today?" "Remote" "Home" "Off - Not working"'
     headers = {
         "Authorization": f"Bearer {SLACK_TOKEN}",
         "Content-Type": "application/json"
     }
     payload = {
         "channel": CHANNEL,
-        "text": text
+        "text": "Are you working today?",
+        "blocks": [
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": "Are you working today?"}
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {"type": "button", "text": {"type": "plain_text", "text": "Remote"}, "value": "remote"},
+                    {"type": "button", "text": {"type": "plain_text", "text": "Home"}, "value": "home"},
+                    {"type": "button", "text": {"type": "plain_text", "text": "Off - Not working"}, "value": "off"}
+                ]
+            }
+        ]
     }
     response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
     print(response.json())
