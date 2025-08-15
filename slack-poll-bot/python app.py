@@ -1,7 +1,6 @@
+# slack-poll-bot/app.py
 import os
 import requests
-from datetime import datetime
-import time
 
 # Slack token i kanal iz environment varijabli
 SLACK_TOKEN = os.environ['SLACK_TOKEN']
@@ -20,15 +19,5 @@ def send_poll():
     response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
     print(response.json())
 
-# Pokreni bot svakog dana u 07:00 i test danas u 13:00
-while True:
-    now = datetime.now()
-    # Redovni poll u 07:00
-    if now.hour == 7 and now.minute == 0:
-        send_poll()
-        time.sleep(60)
-    # Test poll danas u 13:00
-    elif now.hour == 13 and now.minute == 0:
-        send_poll()
-        time.sleep(60)
-    time.sleep(20)
+if __name__ == "__main__":
+    send_poll()
