@@ -1,8 +1,10 @@
+# slack-poll-bot/app.py
 import os
 import requests
+import json
 
 SLACK_TOKEN = os.environ['SLACK_TOKEN']
-CHANNEL = "D02GY0HGEFN"  # General channel ID
+CHANNEL_ID = "D02GY0HGEFN"  # general kanal
 
 def send_poll():
     headers = {
@@ -11,12 +13,15 @@ def send_poll():
     }
 
     payload = {
-        "channel": CHANNEL,
+        "channel": CHANNEL_ID,
         "text": "Are you working today?",
         "blocks": [
             {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": "*Are you working today?*"}
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Are you working today?*"
+                }
             },
             {
                 "type": "actions",
@@ -24,24 +29,31 @@ def send_poll():
                     {
                         "type": "button",
                         "text": {"type": "plain_text", "text": "🏠 Remote"},
-                        "action_id": "remote"
+                        "value": "remote",
+                        "action_id": "remote_click"
                     },
                     {
                         "type": "button",
                         "text": {"type": "plain_text", "text": "🏢 Office"},
-                        "action_id": "office"
+                        "value": "office",
+                        "action_id": "office_click"
                     },
                     {
                         "type": "button",
-                        "text": {"type": "plain_text", "text": "⛔ Off - Not working"},
-                        "action_id": "off"
+                        "text": {"type": "plain_text", "text": "🛑 Off"},
+                        "value": "off",
+                        "action_id": "off_click"
                     }
                 ]
             }
         ]
     }
 
-    response = requests.post("https://slack.com/api/chat.postMessage", headers=headers, json=payload)
+    response = requests.post(
+        "https://slack.com/api/chat.postMessage",
+        headers=headers,
+        data=json.dumps(payload)
+    )
     print(response.json())
 
 if __name__ == "__main__":
