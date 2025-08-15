@@ -1,30 +1,30 @@
 name: Slack Poll Bot
 
+# Ovaj workflow se može pokrenuti ručno
 on:
-  schedule:
-    - cron: "0 7 * * *"   # dnevni poll u 07:00 UTC
-    - cron: "30 11 * * *" # testni poll danas u 13:30 po Sarajevu (UTC+2)
-  workflow_dispatch:       # omogućava ručno pokretanje
+  workflow_dispatch:
 
 jobs:
   send-poll:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      # Kloniranje repozitorija
+      - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Instaliranje Pythona
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
+          python-version: "3.11"
 
+      # Instaliranje zahtjeva (ako ih ima)
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
+        run: pip install requests
 
-      - name: Send poll
+      # Pokretanje Python skripte
+      - name: Run poll bot
+        run: python app.py
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-        run: |
-          python app.py
