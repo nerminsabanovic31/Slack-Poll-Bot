@@ -1,30 +1,50 @@
 name: Slack Poll Bot
 
-# Ovaj workflow se može pokrenuti ručno
 on:
-  workflow_dispatch:
+  workflow_dispatch: # ručno pokretanje
+  schedule:
+    - cron: "0 7 * * *" # svaki dan u 07:00 (UTC)
 
 jobs:
   send-poll:
     runs-on: ubuntu-latest
 
     steps:
-      # Kloniranje repozitorija
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Instaliranje Pythona
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.x"
 
-      # Instaliranje zahtjeva (ako ih ima)
       - name: Install dependencies
         run: pip install requests
 
-      # Pokretanje Python skripte
-      - name: Run poll bot
-        run: python app.py
+      - name: Send Slack poll
+        run: |
+          python - <<'EOF'
+          import os
+          import requests
+
+          SLACK_TOKEN = os.environ['SLACK_TOKEN']
+          CHANNEL = "#general"
+
+          def send_poll():
+              text = '/poll "Are you working today?" "Remote" "Home" "Off - Not working"'
+              headers = {
+                  "Authorization": f"Bearer {SLACK_TOKEN}",
+                  "Content-Type": "application/json"
+              }
+              payload = {
+                  "channel": CHANNEL,
+                  "text": text
+              }
+              response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
+              print(response.json())
+
+          # Pokreće poll odmah kada se workflow starta
+          send_poll()
+          EOF
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
