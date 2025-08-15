@@ -2,14 +2,14 @@
 import os
 import requests
 
-# Slack token iz environment varijabli
+# Slack token iz GitHub Secrets
 SLACK_TOKEN = os.environ['SLACK_TOKEN']
 
-# ID kanala za DM direktno tebi
-CHANNEL = "D02GY0HGEFN"
+# Tvoj Slack User ID (da poruka ide direktno tebi)
+USER_ID = "D02GY0HGEFN"  
 
 def send_poll():
-    # Ovo je samo tekst polla; /poll komanda radi samo u Slack aplikacijama koje imaju Pollys/Slack Slash komande
+    # Poll komanda koja se šalje
     text = '/poll "Are you working today?" "Remote" "Home" "Off - Not working"'
 
     headers = {
@@ -18,12 +18,15 @@ def send_poll():
     }
 
     payload = {
-        "channel": CHANNEL,
+        "channel": USER_ID,
         "text": text
     }
 
     response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
     print(response.json())
+
+if __name__ == "__main__":
+    send_poll()
 
 if __name__ == "__main__":
     send_poll()
