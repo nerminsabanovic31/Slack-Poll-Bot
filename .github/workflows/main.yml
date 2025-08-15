@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Send Slack poll
+      - name: Send Slack poll with buttons
         run: |
           python - <<'EOF'
           import os
@@ -30,21 +30,32 @@ jobs:
           SLACK_TOKEN = os.environ['SLACK_TOKEN']
           CHANNEL = "#general"
 
-          def send_poll():
-              text = '/poll "Are you working today?" "Remote" "Home" "Off - Not working"'
-              headers = {
-                  "Authorization": f"Bearer {SLACK_TOKEN}",
-                  "Content-Type": "application/json"
-              }
-              payload = {
-                  "channel": CHANNEL,
-                  "text": text
-              }
-              response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
-              print(response.json())
+          payload = {
+              "channel": CHANNEL,
+              "text": "Are you working today?",  # fallback text
+              "blocks": [
+                  {
+                      "type": "section",
+                      "text": {"type": "mrkdwn", "text": "*Are you working today?*"}
+                  },
+                  {
+                      "type": "actions",
+                      "elements": [
+                          {"type": "button", "text": {"type": "plain_text", "text": "Remote 🏠"}, "value": "remote"},
+                          {"type": "button", "text": {"type": "plain_text", "text": "Office 🏢"}, "value": "office"},
+                          {"type": "button", "text": {"type": "plain_text", "text": "Off 💤"}, "value": "off"}
+                      ]
+                  }
+              ]
+          }
 
-          # Pokreće poll odmah kada se workflow starta
-          send_poll()
+          headers = {
+              "Authorization": f"Bearer {SLACK_TOKEN}",
+              "Content-Type": "application/json"
+          }
+
+          response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
+          print(response.json())
           EOF
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
