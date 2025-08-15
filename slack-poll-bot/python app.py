@@ -2,11 +2,16 @@
 import os
 import requests
 
-# Slack token i kanal iz environment varijabli
+# Slack token iz environment varijabli
 SLACK_TOKEN = os.environ['SLACK_TOKEN']
-CHANNEL = "#general"  # ili ime tvog kanala
+
+# ID kanala za DM direktno tebi
+CHANNEL = "D02GY0HGEFN"
 
 def send_poll():
+    # Ovo je samo tekst polla; /poll komanda radi samo u Slack aplikacijama koje imaju Pollys/Slack Slash komande
+    text = '/poll "Are you working today?" "Remote" "Home" "Off - Not working"'
+
     headers = {
         "Authorization": f"Bearer {SLACK_TOKEN}",
         "Content-Type": "application/json"
@@ -14,36 +19,7 @@ def send_poll():
 
     payload = {
         "channel": CHANNEL,
-        "text": "Daily poll",
-        "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*Are you working today?*"
-                }
-            },
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {"type": "plain_text", "text": "Remote"},
-                        "value": "remote"
-                    },
-                    {
-                        "type": "button",
-                        "text": {"type": "plain_text", "text": "Home"},
-                        "value": "home"
-                    },
-                    {
-                        "type": "button",
-                        "text": {"type": "plain_text", "text": "Off - Not working"},
-                        "value": "off"
-                    }
-                ]
-            }
-        ]
+        "text": text
     }
 
     response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
