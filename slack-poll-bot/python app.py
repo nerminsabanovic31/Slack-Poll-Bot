@@ -1,32 +1,48 @@
-# slack-poll-bot/app.py
 import os
 import requests
 
-# Slack token iz GitHub Secrets
 SLACK_TOKEN = os.environ['SLACK_TOKEN']
-
-# Tvoj Slack User ID (da poruka ide direktno tebi)
-USER_ID = "D02GY0HGEFN"  
+CHANNEL = "D02GY0HGEFN"  # General channel ID
 
 def send_poll():
-    # Poll komanda koja se šalje
-    text = '/poll "Are you working today?" "Remote" "Home" "Off - Not working"'
-
     headers = {
         "Authorization": f"Bearer {SLACK_TOKEN}",
         "Content-Type": "application/json"
     }
 
     payload = {
-        "channel": USER_ID,
-        "text": text
+        "channel": CHANNEL,
+        "text": "Are you working today?",
+        "blocks": [
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": "*Are you working today?*"}
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": {"type": "plain_text", "text": "🏠 Remote"},
+                        "action_id": "remote"
+                    },
+                    {
+                        "type": "button",
+                        "text": {"type": "plain_text", "text": "🏢 Office"},
+                        "action_id": "office"
+                    },
+                    {
+                        "type": "button",
+                        "text": {"type": "plain_text", "text": "⛔ Off"},
+                        "action_id": "off"
+                    }
+                ]
+            }
+        ]
     }
 
-    response = requests.post("https://slack.com/api/chat.postMessage", json=payload, headers=headers)
+    response = requests.post("https://slack.com/api/chat.postMessage", headers=headers, json=payload)
     print(response.json())
-
-if __name__ == "__main__":
-    send_poll()
 
 if __name__ == "__main__":
     send_poll()
