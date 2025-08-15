@@ -1,15 +1,13 @@
-name: Slack Poll Bot
+name: Daily Slack Poll
 
 on:
   schedule:
-    - cron: '0 7 * * *'   # svakog dana u 07:00 UTC
-    - cron: '0 13 * * *'  # svakog dana u 13:00 UTC
-  workflow_dispatch:       # opcionalno: ručno pokretanje
+    - cron: '0 7 * * *'  # Svaki dan u 07:00 UTC
+  workflow_dispatch:  # Omogućava i manualno pokretanje
 
 jobs:
-  send-poll:
+  send_poll:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -17,14 +15,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
+        run: pip install requests
 
-      - name: Run poll bot
-        run: python slack-poll-bot/app.py
+      - name: Run Slack poll
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+        run: python slack_poll.py
